@@ -58,10 +58,12 @@ build_script:
         }
       }
   - echo "Building $env:GN_CONFIG build"
+  - node --version
   - git config --global core.longpaths true
   - cd ..
   - mkdir src
   - update_depot_tools.bat
+  - node --version
   - ps: Move-Item $env:APPVEYOR_BUILD_FOLDER -Destination src\electron
   - ps: >-
       if (Test-Path 'env:RAW_GOMA_AUTH') {
