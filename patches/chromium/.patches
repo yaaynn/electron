@@ -132,3 +132,4 @@ fix_windows_build_with_enable_plugins_false.patch
 cherry-pick-54a7927b19f9.patch
 cherry-pick-bd9724c9fe63.patch
 cherry-pick-c643d18a078d.patch
+add_electron_deps_to_license_credits_file.patch
