@@ -77,11 +77,6 @@ class SerialChooserContext : public KeyedService,
 
   base::WeakPtr<SerialChooserContext> AsWeakPtr();
 
-  bool is_initialized_ = false;
-
-  // Map from port token to port info.
-  std::map<base::UnguessableToken, device::mojom::SerialPortInfoPtr> port_info_;
-
   // SerialPortManagerClient implementation.
   void OnPortAdded(device::mojom::SerialPortInfoPtr port) override;
   void OnPortRemoved(device::mojom::SerialPortInfoPtr port) override;
@@ -99,9 +94,14 @@ class SerialChooserContext : public KeyedService,
       mojo::PendingRemote<device::mojom::SerialPortManager> manager);
   void OnGetDevices(std::vector<device::mojom::SerialPortInfoPtr> ports);
   void OnPortManagerConnectionError();
-  void RevokeObjectPermissionInternal(const url::Origin& origin,
-                                      const base::Value& object,
-                                      bool revoked_by_website);
+
+  bool is_initialized_ = false;
+
+  // Tracks the set of ports to which an origin has access to.
+  std::map<url::Origin, std::set<base::UnguessableToken>> ephemeral_ports_;
+
+  // Map from port token to port info.
+  std::map<base::UnguessableToken, device::mojom::SerialPortInfoPtr> port_info_;
 
   mojo::Remote<device::mojom::SerialPortManager> port_manager_;
   mojo::Receiver<device::mojom::SerialPortManagerClient> client_receiver_{this};

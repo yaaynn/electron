@@ -385,6 +385,18 @@ callback from `select-serial-port` is called.  This event is intended for use
 when using a UI to ask users to pick a port so that the UI can be updated
 to remove the specified port.
 
+#### Event: 'serial-port-revoked'
+
+Returns:
+
+* `event` Event
+* `details` Object
+  * `origin` string (optional) - The origin that the device has been revoked from.
+
+Emitted after `serialPort.forget()` has been called.  This event can be used
+to help maintain persistent storage of permissions when
+`setDevicePermissionHandler` is used.
+
 ### Instance Methods
 
 The following methods are available on instances of `Session`:
