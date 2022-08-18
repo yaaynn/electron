@@ -69,6 +69,59 @@ console.log(ses.getUserAgent())
 
 The following events are available on instances of `Session`:
 
+#### Event: 'bluetooth-pair-prompt' _Windows_ _Linux_
+
+Returns:
+
+* `event` Event
+* `details` Object
+  * `deviceId` string
+  * `pairingKind` string - The type of pairing prompt being requested.
+     Value will be one of `confirm`, `confirmPin`, or `providePin`.
+    * `confirm`
+      This prompt is requesting confirmation that the bluetooth device should
+      be paired.
+    * `confirmPin`
+      This prompt is requesting confirmation that the provided pin matches the
+      pin displayed on the device.
+    * `providePin`
+      This prompt is requesting that a pin be provided for the device.
+  * `frame` [WebFrameMain](web-frame-main.md)
+  * `pin` string - If the `pairingKind` is `confirmPin`, this value will be
+     the pin value to verify.
+* `callback` Function
+  * `confirmed` boolean - `false` should be passed in if the dialog is canceled.
+    If the `pairingKind` is `confirm` or `confirmPin`, this value should indicate
+    if the pairing is confirmed.  If the `pairingKind` is `providePin` the value
+    should be `true` when a value is provided.
+  * `pin` string | null (optional) - When the `pairingKind` is `providePin`
+    this value should be the required pin for the bluetooth device.
+
+Emitted when a bluetooth device requires a response to pairing.  This event
+allows developers to handle devices that require additional validation for
+pairing.  When handling this event, `event.preventDefault()` should be called
+to prevent the default behavior of cancelling this prompt.
+
+```javascript
+const { session } = require('electron')
+session.defaultSession.on('bluetooth-pair-prompt', (event, details, callback) => {
+  event.preventDefault()
+  switch (details.pairingKind) {
+    case 'confirm': {
+      callback(confirm(`Do you want to connect to device ${details.deviceId}`))
+      break
+    }
+    case 'confirmPin': {
+      callback(confirm(`Does the pin ${details.pin} match the pin displayed on device ${details.deviceId}?`))
+      break
+    }
+    case 'providePin': {
+      callback(true, prompt(`Please provide a pin for ${details.deviceId}`))
+    }
+  }
+})
+```
+
 #### Event: 'will-download'
 
 Returns:
