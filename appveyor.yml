@@ -69,6 +69,7 @@ for:
           if ($result.ExitCode -eq 0) {
             Write-warning "Skipping build for doc only change"; Exit-AppveyorBuild
           }
+          $global:LASTEXITCODE = 0
       - cd ..
       - ps: Write-Host "Building $env:GN_CONFIG build"
       - git config --global core.longpaths true
@@ -128,16 +129,6 @@ for:
       - ps: >-
           if ($depshash_baked -ne $depshash) {
             $env:RUN_GCLIENT_SYNC="true"
-            if (Test-Path -Path $zipfile) {
-              # file exists, unzip and then gclient sync
-              7z x -y $zipfile -mmt=14 -aoa
-              if (-not (Test-Path -Path "src\buildtools")) {
-                if ($env:TARGET_ARCH -ne 'ia32') {
-                  # only save on x64/woa to avoid contention saving
-                  $env:SAVE_GCLIENT_SRC="true"
-                }
-              }
-            }
           }
       - if "%RUN_GCLIENT_SYNC%"=="true" ( gclient sync --with_branch_heads --with_tags ) else ( gclient runhooks )
       - cd src
@@ -235,6 +226,7 @@ for:
           if ($result.ExitCode -eq 0) {
             Write-warning "Skipping tests for doc only change"; Exit-AppveyorBuild
           }
+          $global:LASTEXITCODE = 0
       - cd ..
       - mkdir out\Default
       - cd ..
@@ -284,4 +276,6 @@ for:
       - echo "Done verifying chromedriver"
 
     on_finish:
+      # Uncomment this lines to enable RDP
+      #- ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
       - if exist electron\electron.log ( appveyor-retry appveyor PushArtifact electron\electron.log )
