@@ -1,0 +1,38 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Darshan Sen <raisinten@gmail.com>
+Date: Thu, 25 Aug 2022 18:08:10 +0530
+Subject: src: fix ssize_t error from nghttp2.h
+
+The "node_http2.h" include reordering enforced by clang-format broke Electron's
+Node.js upgrade on Windows. ssize_t is a part of the POSIX standard and it's not
+available on Windows, so the fix for this is to typedef it on Windows like in
+https://github.com/nodejs/node/blob/bb4dff783ddb3b20c67041f7ccef796c335c2407/src/node.h#L212-L220.
+
+Refs: https://github.com/electron/electron/pull/35350#discussion_r954890551
+Signed-off-by: Darshan Sen <raisinten@gmail.com>
+
+diff --git a/src/node_http2.h b/src/node_http2.h
+index 5bd715da8a269799ce8e6746a98184411dd859e0..4c1c21798138ff1caf07916866b92067e1e6ea1c 100644
+--- a/src/node_http2.h
++++ b/src/node_http2.h
+@@ -3,6 +3,20 @@
+ 
+ #if defined(NODE_WANT_INTERNALS) && NODE_WANT_INTERNALS
+ 
++// nghttp2.h needs ssize_t to compile on Windows.
++// Refs: https://github.com/electron/electron/pull/35350#discussion_r954890551
++// Same as
++// https://github.com/nodejs/node/blob/bb4dff783ddb3b20c67041f7ccef796c335c2407/src/node.h#L212-L220.
++#ifdef _WIN32
++#if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
++typedef intptr_t ssize_t;
++#define _SSIZE_T_
++#define _SSIZE_T_DEFINED
++#endif
++#else                   // !_WIN32
++#include <sys/types.h>  // size_t, ssize_t
++#endif                  // _WIN32
++
+ // FIXME(joyeecheung): nghttp2.h needs stdint.h to compile on Windows
+ #include <cstdint>
+ #include "nghttp2/nghttp2.h"
