@@ -6,10 +6,10 @@ Subject: chore: fix -Wimplicit-fallthrough
 Upstreamed at https://github.com/nghttp2/nghttp2/pull/1626.
 
 diff --git a/deps/nghttp2/BUILD.gn b/deps/nghttp2/BUILD.gn
-index 8bfecba74d4d90e9fbf0e2cd301118e4adc6cba8..63e1149f0c4a39cb944114e5824d6074343301e8 100644
+index 9abde472d88923db835b12982b7f2ccb1f260196..b2888250e3edcb8310aac1a6d82a73dcf9b2387d 100644
 --- a/deps/nghttp2/BUILD.gn
 +++ b/deps/nghttp2/BUILD.gn
-@@ -16,7 +16,6 @@ static_library("nghttp2") {
+@@ -14,7 +14,6 @@ static_library("nghttp2") {
  
    cflags_c = [
      "-Wno-implicit-function-declaration",
