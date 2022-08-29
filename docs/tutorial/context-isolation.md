@@ -49,7 +49,21 @@ window.myAPI.doAThing()
 ```
 
 Please read the `contextBridge` documentation linked above to fully understand its limitations. For instance, you can't send custom prototypes or symbols over the bridge.
+## Enable contextIsolation and use fs
 
+```javascript title="main.js"
+let win = new BrowserWindow({
+    ...
+    webPreferences: {
+      ...
+      sandbox: false,
+      preload: path.join(__dirname, 'preload.js')
+      ...
+    },
+    ...
+  })
+```
+set sandbox to false, otherwise use fs,will show that it cannot be found.
 ## Security considerations
 
 Just enabling `contextIsolation` and using `contextBridge` does not automatically mean that everything you do is safe. For instance, this code is **unsafe**.
